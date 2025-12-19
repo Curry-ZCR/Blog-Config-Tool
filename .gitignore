@@ -36,3 +36,4 @@ coverage/
 
 # Settings (may contain sensitive data)
 backend/settings.json
+GEMINI.md
