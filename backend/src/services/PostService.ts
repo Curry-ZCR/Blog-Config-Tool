@@ -89,55 +89,81 @@ export class PostService {
     return result
   }
 
-  /**
-   * Generate Front-matter YAML from post data
-   * 
-   * Requirements: 2.2, 5.2
-   */
-  generateFrontMatter(post: CreatePostRequest): string {
-    const lines: string[] = ['---']
-    
-    // Title (required)
-    lines.push(`title: '${post.title.replace(/'/g, "''")}'`)
-    
-    // Date (required)
-    lines.push(`date: ${post.date}`)
-    
-    // Draft status
-    if (post.draft !== undefined) {
-      lines.push(`draft: ${post.draft}`)
-    }
-    
-    // Categories (optional)
-    if (post.categories && post.categories.length > 0) {
-      lines.push('categories:')
-      for (const cat of post.categories) {
-        lines.push(`  - ${cat}`)
+    /**
+     * Generate Front-matter YAML from post data
+     *
+     * Requirements: 2.2, 5.2
+     */
+    generateFrontMatter(post: CreatePostRequest): string {
+      const lines: string[] = ['---']
+      
+      // Helper to safely add string fields
+      const addString = (key: string, value?: string) => {
+          if (value !== undefined && value !== null && value !== '') {
+              lines.push(`${key}: '${value.replace(/'/g, "''")}'`)
+          }
       }
-    }
-    
-    // Tags (optional)
-    if (post.tags && post.tags.length > 0) {
-      lines.push('tags:')
-      for (const tag of post.tags) {
-        lines.push(`  - ${tag}`)
+      
+      // Helper for boolean fields
+      const addBoolean = (key: string, value?: boolean) => {
+          if (value !== undefined && value !== null) {
+              lines.push(`${key}: ${value}`)
+          }
       }
+  
+      // Helper for number fields
+      const addNumber = (key: string, value?: number) => {
+          if (value !== undefined && value !== null && !isNaN(value)) {
+              lines.push(`${key}: ${value}`)
+          }
+      }
+  
+      // Helper for array fields
+      const addArray = (key: string, value?: string[]) => {
+          if (value && value.length > 0) {
+              lines.push(`${key}:`)
+              value.forEach(v => lines.push(`  - ${v}`))
+          }
+      }
+  
+      // Required fields
+      addString('title', post.title)
+      lines.push(`date: ${post.date}`)
+  
+      // Optional fields
+      addString('lastmod', post.lastmod)
+      addString('summary', post.summary)
+      addNumber('weight', post.weight)
+      addArray('categories', post.categories)
+      addArray('tags', post.tags)
+      addString('description', post.description)
+      addBoolean('mermaid', post.mermaid)
+      addBoolean('math', post.math)
+      addString('link', post.link)
+      addBoolean('copyright', post.copyright)
+      addBoolean('sponsor', post.sponsor)
+      addBoolean('comments', post.comments)
+      addArray('photos', post.photos)
+      
+      // Sidebar needs special handling for boolean | string
+      if (post.sidebar !== undefined && post.sidebar !== null) {
+          if (post.sidebar === false) {
+               lines.push(`sidebar: false`)
+          } else {
+               lines.push(`sidebar: '${post.sidebar}'`)
+          }
+      }
+  
+      addBoolean('toc', post.toc)
+      addBoolean('outdated', post.outdated)
+      addString('author', post.author)
+      addArray('keywords', post.keywords)
+      addString('cover', post.cover)
+      addBoolean('draft', post.draft)
+  
+      lines.push('---')
+      return lines.join('\n')
     }
-    
-    // Cover image (optional)
-    if (post.cover) {
-      lines.push(`cover: '${post.cover}'`)
-    }
-    
-    // Description (optional)
-    if (post.description) {
-      lines.push(`description: '${post.description.replace(/'/g, "''")}'`)
-    }
-    
-    lines.push('---')
-    return lines.join('\n')
-  }
-
 
   /**
    * Create a new blog post

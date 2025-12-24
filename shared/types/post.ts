@@ -2,32 +2,33 @@
 export interface PostMeta {
   title: string
   date: string
-  draft: boolean
+  lastmod?: string
+  summary?: string
+  weight?: number
   categories?: string[]
   tags?: string[]
-  cover?: string
   description?: string
-  toc?: boolean
-  math?: boolean
   mermaid?: boolean
-  sticky?: number
+  math?: boolean
+  link?: string
+  copyright?: boolean
+  sponsor?: boolean
+  comments?: boolean
+  photos?: string[]
+  sidebar?: 'left' | 'right' | false
+  toc?: boolean
+  outdated?: boolean
+  author?: string
+  keywords?: string[]
+  cover?: string
+  draft?: boolean
 }
 
 // Front-matter extends PostMeta
-export interface FrontMatter extends PostMeta {
-  lastmod?: string
-}
+export interface FrontMatter extends PostMeta {}
 
 // Request to create a new post
-export interface CreatePostRequest {
-  title: string
-  date: string
-  categories?: string[]
-  tags?: string[]
-  cover?: string
-  description?: string
-  draft?: boolean
-}
+export interface CreatePostRequest extends PostMeta {}
 
 // Response after creating a post
 export interface CreatePostResponse {
